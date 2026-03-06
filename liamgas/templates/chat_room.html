@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ room.name }}</title>
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f6f3e7;
+    margin: 12px;
+}
+
+.container {
+    width: 750px;
+}
+
+.messages {
+    border: 2px solid #dcd6c3;
+    background: #faf7ee;
+    height: 400px;
+    overflow-y: scroll;
+    padding: 8px;
+    border-radius: 12px;
+}
+
+/* message row */
+.message {
+    display: flex;
+    gap: 8px;
+    border: 1px solid #e5e0cd;
+    background: #fffdf6;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+}
+
+.message.own {
+    background: #f4f1e5;
+}
+
+/* avatar */
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* fallback avatar */
+.no-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #dcd6c3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* message content */
+.message-content {
+    flex: 1;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.timestamp {
+    font-size: 11px;
+    color: #777;
+}
+
+/* input */
+input[type="text"] {
+    border: 2px solid #dcd6c3;
+    background: #fffdf6;
+    padding: 6px;
+    width: 65%;
+    border-radius: 8px;
+}
+
+/* buttons */
+button {
+    border: 2px solid #d0cab6;
+    background: #f3efe2;
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #d0cab6;
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #d0cab6;
+}
+
+.status {
+    border: 1px solid #e2ddc8;
+    background: #f6f2e6;
+    padding: 4px;
+    margin: 4px 0;
+    border-radius: 8px;
+    font-size: 12px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ room.name }}</h1>
+        <a href="{% url 'chat_rooms' %}" class="back">Back to Rooms</a>
+        <div id="status" class="status">Connecting...</div>
+        <div class="messages" id="messages">
+            {% for message in messages %}
+            <div class="message {% if message.user == user %}own{% else %}other{% endif %}">
+                {% if message.user.userprofile.profile_picture %}
+                <img src="{{ message.user.userprofile.profile_picture.url }}" alt="Avatar" class="user-avatar">
+                {% else %}
+                <div class="no-avatar">{{ message.user.username|slice:":1"|upper }}</div>
+                {% endif %}
+                <div class="message-content">
+                    <strong>{{ message.user.username }}</strong>: {{ message.content }}
+                    <div class="timestamp">{{ message.timestamp|date:"M j, H:i" }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <form id="messageForm">
+            {% csrf_token %}
+            <input type="text" id="messageInput" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const roomId = {{ room.id }};
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const messageForm = document.getElementById('messageForm');
+        const statusDiv = document.getElementById('status');
+        let lastMessageId = 0;
+
+        // Get initial messages
+        {% for message in messages %}
+        lastMessageId = Math.max(lastMessageId, {{ message.id }});
+        {% endfor %}
+
+        statusDiv.textContent = 'Connected - Real-time chat active!';
+        statusDiv.style.background = '#d4edda';
+
+        // Poll for new messages every 2 seconds
+        setInterval(fetchNewMessages, 2000);
+
+        function fetchNewMessages() {
+            fetch(`/chat/${roomId}/messages/?after=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(message => {
+                            addMessageToUI(message);
+                            lastMessageId = Math.max(lastMessageId, message.id);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching messages:', error);
+                    statusDiv.textContent = 'Connection issue - messages may be delayed';
+                    statusDiv.style.background = '#fff3cd';
+                });
+        }
+
+        function addMessageToUI(message) {
+            const messageDiv = document.createElement('div');
+            const isOwnMessage = message.user === '{{ user.username }}';
+
+            messageDiv.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            messageDiv.innerHTML = `
+                ${isOwnMessage ? '' : (message.profile_picture ?
+                    `<img src="${message.profile_picture}" alt="Avatar" class="user-avatar">` :
+                    `<div class="no-avatar">${message.user.charAt(0).toUpperCase()}</div>`)}
+                <div class="message-content">
+                    <strong>${message.user}</strong>: ${message.content}
+                    <div class="timestamp">${new Date(message.timestamp).toLocaleString()}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        messageForm.onsubmit = function(e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                // Send message via AJAX
+                fetch(`/chat/${roomId}/send/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: `content=${encodeURIComponent(message)}`
+                })
+                .then(response => {
+                    if (response.ok) {
+                        messageInput.value = '';
+                        // Message will be fetched by polling
+                    } else {
+                        alert('Error sending message');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message');
+                });
+            }
+        };
+
+        // Auto-scroll to bottom on load
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">

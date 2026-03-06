@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Rooms</title>
+    <style>
+        body {
+    font-family: Arial;
+    background: #f6f3e7;
+    margin: 12px;
+}
+
+.container {
+    width: 800px;
+}
+
+.header {
+    margin-bottom: 10px;
+}
+
+/* room boxes */
+.room {
+    border: 2px solid #dcd6c3;
+    background: #fffdf6;
+    padding: 6px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+}
+
+.room-info h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.room-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.room-stats {
+    font-size: 11px;
+    color: #777;
+}
+
+/* buttons */
+.btn {
+    border: 2px solid #d0cab6;
+    padding: 4px 8px;
+    text-decoration: none;
+    color: black;
+    background: #f3efe2;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 3px 0 #d0cab6;
+}
+
+.btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #d0cab6;
+}
+
+.logout {
+    background: #ffdede;
+}
+
+.create {
+    background: #e7f7e7;
+}
+
+/* online users box */
+.online-users {
+    border: 2px solid #dcd6c3;
+    background: #faf7ee;
+    padding: 6px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+/* user tags */
+.user {
+    display: inline-block;
+    border: 1px solid #e0dac6;
+    background: #fffdf6;
+    padding: 3px 6px;
+    margin: 2px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.user.online {
+    background: #eaf7ea;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chat Rooms</h1>
+            <div>
+                {% if user.is_superuser %}
+                <a href="{% url 'create_room' %}" class="btn create">Create New Room</a>
+                {% endif %}
+                <a href="{% url 'profile' %}" class="btn" style="background: #17a2b8;">Profile</a>
+                <a href="{% url 'logout' %}" class="btn logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="online-users">
+            <h3>Welcome back, {{ user.username }}!</h3>
+            <p>Choose a room to start chatting in real-time.</p>
+        </div>
+
+        {% for room in rooms %}
+        <div class="room">
+            <div class="room-info">
+                <h3><a href="{% url 'chat_room' room.id %}">{{ room.name }}</a></h3>
+                {% if room.description %}
+                <p>{{ room.description }}</p>
+                {% endif %}
+                <small>Created by {{ room.created_by.username }} • {{ room.created_at|date:"M j, Y" }}</small>
+            </div>
+            <div class="room-stats">
+                <div>{{ room.message_set.count }} messages</div>
+                <div style="color: #007bff;">Real-time chat</div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not rooms %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+            <h3>No chat rooms yet!</h3>
+            <p>Be the first to create a room and start chatting.</p>
+            <a href="{% url 'create_room' %}" class="btn create">Create First Room</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html></content>
+<parameter name="filePath">
