@@ -203,6 +203,9 @@ def fix_db():
                 conn.commit()
                 msg = "Added column profile_pic_url. "
             except Exception as e:
+                # If it failed (e.g. column exists), we MUST rollback the transaction
+                # or Postgres blocks all future queries on this connection.
+                conn.rollback()
                 msg = f"Column add skipped ({e}). "
             
             # 2. VERIFY columns
