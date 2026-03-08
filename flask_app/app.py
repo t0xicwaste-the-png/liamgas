@@ -193,6 +193,16 @@ def get_messages(room_id):
     
     return jsonify({'messages': messages_data})
 
+@app.route('/fix-db-now')
+def fix_db():
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(text('ALTER TABLE "user" ADD COLUMN IF NOT EXISTS profile_pic_url VARCHAR(500) DEFAULT \'https://www.gravatar.com/avatar/?d=mp\''))
+            conn.commit()
+        return "Database Fixed! Go back to <a href='/'>Home</a>"
+    except Exception as e:
+        return f"Error fixing DB: {e}"
+
 if __name__ == '__main__':
     # (Optional) We can leave this here too for local dev convenience, 
     # but the one above handles production.
