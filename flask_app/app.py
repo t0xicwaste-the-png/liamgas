@@ -124,13 +124,15 @@ def chat_rooms():
 @app.route('/chat/create/', methods=['GET', 'POST'])
 @login_required
 def create_room():
-    if not current_user.is_admin:
-        flash('Only admins can create rooms.')
-        return redirect(url_for('chat_rooms'))
-        
+    # Admin check REMOVED - anyone can create rooms now!
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
+        
+        if not name:
+            flash('Room name is required.')
+            return redirect(url_for('create_room'))
+            
         new_room = ChatRoom(name=name, description=description, created_by=current_user.id)
         db.session.add(new_room)
         db.session.commit()
