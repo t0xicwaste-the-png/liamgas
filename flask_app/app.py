@@ -26,8 +26,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    # Profile picture URL (default to a generic avatar)
-    profile_pic_url = db.Column(db.String(500), default='https://www.gravatar.com/avatar/?d=mp')
+    # Profile picture URL (default is None/Null)
+    profile_pic_url = db.Column(db.String(500))
     messages = db.relationship('Message', backref='author', lazy=True)
     rooms = db.relationship('ChatRoom', backref='creator', lazy=True)
 
@@ -197,11 +197,21 @@ def get_messages(room_id):
 def fix_db():
     try:
         with db.engine.connect() as conn:
-            conn.execute(text('ALTER TABLE "user" ADD COLUMN IF NOT EXISTS profile_pic_url VARCHAR(500) DEFAULT \'https://www.gravatar.com/avatar/?d=mp\''))
-            conn.commit()
-        return "Database Fixed! Go back to <a href='/'>Home</a>"
+            # 1. Try to add the column
+            try:
+                conn.execute(text('ALTER TABLE "user" ADD COLUMN profile_pic_url VARCHAR(500)'))
+                conn.commit()
+                msg = "Added column profile_pic_url. "
+            except Exception as e:
+                msg = f"Column add skipped ({e}). "
+            
+            # 2. VERIFY columns
+            result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='user'"))
+            columns = [row[0] for row in result]
+            
+        return f"{msg} Current columns in 'user': {columns}. <br><a href='/'>Go Home</a>"
     except Exception as e:
-        return f"Error fixing DB: {e}"
+        return f"Error: {e}"
 
 if __name__ == '__main__':
     # (Optional) We can leave this here too for local dev convenience, 
