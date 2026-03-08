@@ -125,14 +125,18 @@ def logout():
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    if request.method == 'POST':
-        new_pic_url = request.form.get('profile_pic_url')
-        if new_pic_url:
-            current_user.profile_pic_url = new_pic_url
-            db.session.commit()
-            flash('Profile picture updated!')
-        return redirect(url_for('profile'))
-    return render_template('profile.html', user=current_user)
+    try:
+        if request.method == 'POST':
+            new_pic_url = request.form.get('profile_pic_url')
+            if new_pic_url:
+                current_user.profile_pic_url = new_pic_url
+                db.session.commit()
+                flash('Profile picture updated!')
+            return redirect(url_for('profile'))
+        return render_template('profile.html', user=current_user)
+    except Exception as e:
+        print(f"PROFILE ERROR: {e}")
+        return f"Error loading profile: {e}"
 
 @app.route('/chat/')
 @login_required
