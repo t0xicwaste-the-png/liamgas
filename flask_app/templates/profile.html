@@ -1,32 +1,59 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3>User Profile</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">LiamGas</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('chat_rooms') }}">Chat Rooms</a>
+                <a class="nav-link active" href="{{ url_for('profile') }}">Profile</a>
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3 text-center mb-3">
-                    <img src="{{ user.profile_pic_url }}" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
-                </div>
-                <div class="col-md-9">
-                    <h4 class="card-title">{{ user.username }}</h4>
-                    <p class="card-text text-muted">User ID: {{ user.id }}</p>
-                    <p class="card-text text-muted">Admin: {{ user.is_admin }}</p>
-                    
-                    <form method="POST" action="{{ url_for('profile') }}" class="mt-4">
-                        <div class="mb-3">
-                            <label for="profile_pic_url" class="form-label">Profile Picture URL</label>
-                            <input type="text" class="form-control" id="profile_pic_url" name="profile_pic_url" value="{{ user.profile_pic_url }}">
-                            <div class="form-text">Paste a direct link to an image (e.g. from Discord, Imgur, or Google).</div>
-                        </div>
-                        <button type="submit" class="btn btn-secondary">Update Profile Picture</button>
-                    </form>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3>User Profile</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        {% if user.profile_pic_url %}
+                            <img src="{{ user.profile_pic_url }}" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white mx-auto" style="width: 150px; height: 150px; font-size: 64px;">
+                                {{ user.username[0].upper() }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-9">
+                        <h4 class="card-title">{{ user.username }}</h4>
+                        <p class="card-text text-muted">User ID: {{ user.id }}</p>
+                        <p class="card-text text-muted">Admin: {{ user.is_admin }}</p>
+                        
+                        <form method="POST" action="{{ url_for('profile') }}" class="mt-4">
+                            <div class="mb-3">
+                                <label for="profile_pic_url" class="form-label">Profile Picture URL</label>
+                                <input type="text" class="form-control" id="profile_pic_url" name="profile_pic_url" value="{{ user.profile_pic_url or '' }}" placeholder="https://example.com/image.png">
+                                <div class="form-text">Paste a direct link to an image (e.g. from Discord, Imgur, or Google).</div>
+                            </div>
+                            <button type="submit" class="btn btn-secondary">Update Profile Picture</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
