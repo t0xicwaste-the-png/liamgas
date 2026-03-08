@@ -3,6 +3,19 @@
 <head>
     <title>{{ room.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .own .profile-pic {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,7 +25,11 @@
         <div class="messages" id="messages">
             {% for message in messages %}
             <div class="message {% if message.author.username == current_user.username %}own{% else %}other{% endif %}">
-                <div class="no-avatar">{{ message.author.username[0].upper() }}</div>
+                {% if message.author.profile_pic_url %}
+                    <img src="{{ message.author.profile_pic_url }}" class="profile-pic" alt="{{ message.author.username }}">
+                {% else %}
+                    <div class="no-avatar">{{ message.author.username[0].upper() }}</div>
+                {% endif %}
                 <div class="message-content">
                     <strong>{{ message.author.username }}</strong>: {{ message.content }}
                     <div class="timestamp">{{ message.timestamp.strftime('%b %d, %H:%M') }}</div>
@@ -51,9 +68,12 @@
                 .then(data => {
                     if (data.messages && data.messages.length > 0) {
                         data.messages.forEach(message => {
-                            addMessageToUI(message);
-                            lastMessageId = Math.max(lastMessageId, message.id);
+                            if (message.id > lastMessageId) {
+                                addMessageToUI(message);
+                                lastMessageId = Math.max(lastMessageId, message.id);
+                            }
                         });
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     }
                 })
                 .catch(error => {
@@ -68,8 +88,16 @@
             const isOwnMessage = message.user === '{{ current_user.username }}';
 
             messageDiv.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            
+            let avatarHtml = '';
+            if (message.profile_picture) {
+                avatarHtml = `<img src="${message.profile_picture}" class="profile-pic" alt="${message.user}">`;
+            } else {
+                avatarHtml = `<div class="no-avatar">${message.user.charAt(0).toUpperCase()}</div>`;
+            }
+
             messageDiv.innerHTML = `
-                <div class="no-avatar">${message.user.charAt(0).toUpperCase()}</div>
+                ${avatarHtml}
                 <div class="message-content">
                     <strong>${message.user}</strong>: ${message.content}
                     <div class="timestamp">${new Date(message.timestamp).toLocaleString()}</div>
@@ -77,26 +105,23 @@
             `;
 
             messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
         messageForm.onsubmit = function(e) {
             e.preventDefault();
             const message = messageInput.value.trim();
             if (message) {
-                // Send message via AJAX
                 fetch(`/chat/${roomId}/send/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
-                        // CSRF removed for MVP simplicity
                     },
                     body: `content=${encodeURIComponent(message)}`
                 })
                 .then(response => {
                     if (response.ok) {
                         messageInput.value = '';
-                        // Message will be fetched by polling
+                        fetchNewMessages(); // Fetch immediately so user sees it faster
                     } else {
                         alert('Error sending message');
                     }

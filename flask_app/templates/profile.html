@@ -1,22 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Profile</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>{{ current_user.username }}'s Profile</h1>
+{% extends "base.html" %}
 
-        <div style="text-align: center;">
-            <div class="no-pic">{{ current_user.username[0].upper() }}</div>
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3>User Profile</h3>
         </div>
-        
-        <p style="text-align: center; color: #777;">(Profile pictures are disabled on free hosting)</p>
-
-        <div style="margin-top: 30px;">
-            <a href="{{ url_for('chat_rooms') }}" class="back">Back to Chat Rooms</a>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <img src="{{ user.profile_pic_url }}" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
+                </div>
+                <div class="col-md-9">
+                    <h4 class="card-title">{{ user.username }}</h4>
+                    <p class="card-text text-muted">User ID: {{ user.id }}</p>
+                    <p class="card-text text-muted">Admin: {{ user.is_admin }}</p>
+                    
+                    <form method="POST" action="{{ url_for('profile') }}" class="mt-4">
+                        <div class="mb-3">
+                            <label for="profile_pic_url" class="form-label">Profile Picture URL</label>
+                            <input type="text" class="form-control" id="profile_pic_url" name="profile_pic_url" value="{{ user.profile_pic_url }}">
+                            <div class="form-text">Paste a direct link to an image (e.g. from Discord, Imgur, or Google).</div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Update Profile Picture</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

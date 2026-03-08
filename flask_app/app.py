@@ -26,7 +26,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    # Profile picture removed for simplicity (Render ephemeral FS)
+    # Profile picture URL (default to a generic avatar)
+    profile_pic_url = db.Column(db.String(500), default='https://www.gravatar.com/avatar/?d=mp')
     messages = db.relationship('Message', backref='author', lazy=True)
     rooms = db.relationship('ChatRoom', backref='creator', lazy=True)
 
@@ -45,10 +46,21 @@ class Message(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
 
+from sqlalchemy import text
+
 # Auto-create tables on startup (Essential for Render)
 # Must be AFTER models are defined!
 with app.app_context():
     db.create_all()
+    # Migration: Add profile_pic_url if it doesn't exist
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(text("ALTER TABLE user ADD COLUMN profile_pic_url VARCHAR(500) DEFAULT 'https://www.gravatar.com/avatar/?d=mp'"))
+            conn.commit()
+            print("Added profile_pic_url column to User table.")
+    except Exception as e:
+        # Ignore error if column already exists
+        print(f"Migration skipped (likely already done): {e}")
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -109,10 +121,16 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    # Profile pic removed
+    if request.method == 'POST':
+        new_pic_url = request.form.get('profile_pic_url')
+        if new_pic_url:
+            current_user.profile_pic_url = new_pic_url
+            db.session.commit()
+            flash('Profile picture updated!')
+        return redirect(url_for('profile'))
     return render_template('profile.html', user=current_user)
 
 @app.route('/chat/')
@@ -169,8 +187,7 @@ def get_messages(room_id):
         'user': msg.author.username,
         'content': msg.content,
         'timestamp': msg.timestamp.isoformat(),
-        # No profile picture URL
-        'profile_picture': None
+        'profile_picture': msg.author.profile_pic_url
     } for msg in new_messages]
     
     return jsonify({'messages': messages_data})
