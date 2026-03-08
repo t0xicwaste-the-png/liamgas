@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ room.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ room.name }}</h1>
+        <a href="{{ url_for('chat_rooms') }}" class="back">Back to Rooms</a>
+        <div id="status" class="status">Connecting...</div>
+        <div class="messages" id="messages">
+            {% for message in messages %}
+            <div class="message {% if message.author.username == current_user.username %}own{% else %}other{% endif %}">
+                <div class="no-avatar">{{ message.author.username[0].upper() }}</div>
+                <div class="message-content">
+                    <strong>{{ message.author.username }}</strong>: {{ message.content }}
+                    <div class="timestamp">{{ message.timestamp.strftime('%b %d, %H:%M') }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <form id="messageForm">
+            <input type="text" id="messageInput" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const roomId = {{ room.id }};
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const messageForm = document.getElementById('messageForm');
+        const statusDiv = document.getElementById('status');
+        let lastMessageId = 0;
+
+        // Get initial messages
+        {% for message in messages %}
+        lastMessageId = Math.max(lastMessageId, {{ message.id }});
+        {% endfor %}
+
+        statusDiv.textContent = 'Connected - Real-time chat active!';
+        statusDiv.style.background = '#d4edda';
+
+        // Poll for new messages every 2 seconds
+        setInterval(fetchNewMessages, 2000);
+
+        function fetchNewMessages() {
+            fetch(`/chat/${roomId}/messages/?after=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(message => {
+                            addMessageToUI(message);
+                            lastMessageId = Math.max(lastMessageId, message.id);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching messages:', error);
+                    statusDiv.textContent = 'Connection issue - messages may be delayed';
+                    statusDiv.style.background = '#fff3cd';
+                });
+        }
+
+        function addMessageToUI(message) {
+            const messageDiv = document.createElement('div');
+            const isOwnMessage = message.user === '{{ current_user.username }}';
+
+            messageDiv.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            messageDiv.innerHTML = `
+                <div class="no-avatar">${message.user.charAt(0).toUpperCase()}</div>
+                <div class="message-content">
+                    <strong>${message.user}</strong>: ${message.content}
+                    <div class="timestamp">${new Date(message.timestamp).toLocaleString()}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        messageForm.onsubmit = function(e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                // Send message via AJAX
+                fetch(`/chat/${roomId}/send/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                        // CSRF removed for MVP simplicity
+                    },
+                    body: `content=${encodeURIComponent(message)}`
+                })
+                .then(response => {
+                    if (response.ok) {
+                        messageInput.value = '';
+                        // Message will be fetched by polling
+                    } else {
+                        alert('Error sending message');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message');
+                });
+            }
+        };
+
+        // Auto-scroll to bottom on load
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    </script>
+</body>
+</html>

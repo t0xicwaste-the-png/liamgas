@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Chat System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <img src="{{ url_for('static', filename='images/home.png') }}">
+            <a href="{{ url_for('chat_rooms') }}"><img src="{{ url_for('static', filename='images/textbubble.png') }}"></a>
+            <img src="{{ url_for('static', filename='images/gas.png') }}">
+        </div>
+        <div class="main-content">
+            <h1>Welcome to liam gas</h1>
+            <marquee>harlanisabarlan and ima tarlan </marquee>
+            <p>unc knows html :speedface:</p>
+            <button onclick="gasup()">gas up</button>
+            <img id="car" style="position: absolute; left: 300px; top:420px; pointer-events: none;" src="{{ url_for('static', filename='car.png') }}">
+        </div>
+    </div>
+    <script>
+        let animationInterval
+        function gasup() {
+            if (animationInterval) clearInterval(animationInterval)
+            let car = document.getElementById("car")
+            let left = 300
+            animationInterval = setInterval(() => {
+                left -= 10
+                car.style.left = left + "px"
+            }, 50)
+        }
+    </script>
+</body>
+</html>

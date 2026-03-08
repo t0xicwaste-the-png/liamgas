@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ current_user.username }}'s Profile</h1>
+
+        <div style="text-align: center;">
+            <div class="no-pic">{{ current_user.username[0].upper() }}</div>
+        </div>
+        
+        <p style="text-align: center; color: #777;">(Profile pictures are disabled on free hosting)</p>
+
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('chat_rooms') }}" class="back">Back to Chat Rooms</a>
+        </div>
+    </div>
+</body>
+</html>

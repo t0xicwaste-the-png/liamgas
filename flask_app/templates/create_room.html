@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Chat Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create New Chat Room</h1>
+        <a href="{{ url_for('chat_rooms') }}" class="back">Back to Rooms</a>
+        <form method="post">
+            <input type="text" name="name" placeholder="Room Name" required>
+            <textarea name="description" placeholder="Description (optional)"></textarea>
+            <button type="submit">Create Room</button>
+        </form>
+    </div>
+</body>
+</html>

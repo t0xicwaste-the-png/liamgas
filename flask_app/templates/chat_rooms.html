@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Rooms</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chat Rooms</h1>
+            <div>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('create_room') }}" class="btn create">Create New Room</a>
+                {% endif %}
+                <a href="{{ url_for('profile') }}" class="btn" style="background: #17a2b8;">Profile</a>
+                <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="online-users">
+            <h3>Welcome back, {{ current_user.username }}!</h3>
+            <p>Choose a room to start chatting in real-time.</p>
+        </div>
+
+        {% for room in rooms %}
+        <div class="room">
+            <div class="room-info">
+                <h3><a href="{{ url_for('chat_room', room_id=room.id) }}">{{ room.name }}</a></h3>
+                {% if room.description %}
+                <p>{{ room.description }}</p>
+                {% endif %}
+                <small>Created by {{ room.creator.username }} • {{ room.created_at.strftime('%b %d, %Y') }}</small>
+            </div>
+            <div class="room-stats">
+                <div>{{ room.messages|length }} messages</div>
+                <div style="color: #007bff;">Real-time chat</div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not rooms %}
+        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+            <h3>No chat rooms yet!</h3>
+            <p>Be the first to create a room and start chatting.</p>
+            <a href="{{ url_for('create_room') }}" class="btn create">Create First Room</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
