@@ -62,20 +62,29 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists.')
-            return redirect(url_for('register'))
+        try:
+            username = request.form.get('username')
+            password = request.form.get('password')
             
-        hashed_password = generate_password_hash(password, method='sha256')
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        login_user(new_user)
-        return redirect(url_for('chat_rooms'))
+            if not username or not password:
+                 flash('Username and password are required.')
+                 return redirect(url_for('register'))
+
+            if User.query.filter_by(username=username).first():
+                flash('Username already exists.')
+                return redirect(url_for('register'))
+                
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            new_user = User(username=username, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            
+            login_user(new_user)
+            return redirect(url_for('chat_rooms'))
+        except Exception as e:
+            print(f"REGISTER ERROR: {e}")
+            flash(f"Error registering: {e}")
+            return redirect(url_for('register'))
         
     return render_template('register.html')
 
