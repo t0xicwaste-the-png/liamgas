@@ -197,29 +197,6 @@ def get_messages(room_id):
     
     return jsonify({'messages': messages_data})
 
-@app.route('/fix-db-now')
-def fix_db():
-    try:
-        with db.engine.connect() as conn:
-            # 1. Try to add the column
-            try:
-                conn.execute(text('ALTER TABLE "user" ADD COLUMN profile_pic_url VARCHAR(500)'))
-                conn.commit()
-                msg = "Added column profile_pic_url. "
-            except Exception as e:
-                # If it failed (e.g. column exists), we MUST rollback the transaction
-                # or Postgres blocks all future queries on this connection.
-                conn.rollback()
-                msg = f"Column add skipped ({e}). "
-            
-            # 2. VERIFY columns
-            result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='user'"))
-            columns = [row[0] for row in result]
-            
-        return f"{msg} Current columns in 'user': {columns}. <br><a href='/'>Go Home</a>"
-    except Exception as e:
-        return f"Error: {e}"
-
 if __name__ == '__main__':
     # (Optional) We can leave this here too for local dev convenience, 
     # but the one above handles production.
