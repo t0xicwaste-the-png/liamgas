@@ -55,7 +55,8 @@ with app.app_context():
     # Migration: Add profile_pic_url if it doesn't exist
     try:
         with db.engine.connect() as conn:
-            conn.execute(text("ALTER TABLE user ADD COLUMN profile_pic_url VARCHAR(500) DEFAULT 'https://www.gravatar.com/avatar/?d=mp'"))
+            # Postgres requires "user" to be quoted because it's a reserved keyword
+            conn.execute(text('ALTER TABLE "user" ADD COLUMN profile_pic_url VARCHAR(500) DEFAULT \'https://www.gravatar.com/avatar/?d=mp\''))
             conn.commit()
             print("Added profile_pic_url column to User table.")
     except Exception as e:
