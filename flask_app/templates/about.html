@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About - LiamGas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}" alt="Home"></a>
+        </div>
+        <div class="main-content">
+            <h1>About Us</h1>
+            <p>Welcome to LiamGas, the premier destination for real-time web communication.</p>
+            <p>Founded in 2026, LiamGas was created to address the need for a lightweight, fast, and community-driven chat platform. Our tech stack is built on Python, Flask, and PostgreSQL, ensuring a robust environment capable of handling high concurrency and seamless user experiences.</p>
+            <h2>Our Vision</h2>
+            <p>We believe in the power of direct communication. By removing bloatware and complex interfaces, LiamGas provides a distraction-free zone for students, developers, and creatives to share ideas instantly.</p>
+            <h2>Technology</h2>
+            <p>We deploy on Render using a serverless database architecture. Our front-end utilizes asynchronous JavaScript and XML (AJAX) to fetch new messages without requiring page reloads, simulating a web-socket-like experience with exceptional reliability.</p>
+            
+            <a href="{{ url_for('home') }}">Return Home</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,25 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome to Chat System</title>
+    <title>LiamGas - Real-Time Community Chat Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3967455593918125"
      crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .seo-content {
+            margin-top: 50px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.8em;
+        }
+        .footer a {
+            color: #888;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <div class="sidebar">
-            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}"></a>
-            <a href="{{ url_for('chat_rooms') }}"><img src="{{ url_for('static', filename='images/textbubble.png') }}"></a>
-            <img src="{{ url_for('static', filename='images/gas.png') }}">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}" alt="Home"></a>
+            <a href="{{ url_for('chat_rooms') }}"><img src="{{ url_for('static', filename='images/textbubble.png') }}" alt="Chat"></a>
+            <img src="{{ url_for('static', filename='images/gas.png') }}" alt="Gas">
         </div>
         <div class="main-content">
-            <h1>Welcome to liam gas</h1>
-            <marquee>harlanisabarlan and ima tarlan </marquee>
+            <h1>Welcome to LiamGas</h1>
+            
+            <!-- Your original meme stuff -->
+            <marquee>harlanisabarlan and ima tarlan</marquee>
             <p>unc knows html :speedface:</p>
             <button onclick="gasup()">gas up</button>
             <img id="car" style="position: absolute; left: 300px; top:420px; pointer-events: none;" src="{{ url_for('static', filename='car.png') }}">
+
+            <!-- AdSense / SEO Content Section -->
+            <div class="seo-content">
+                <h2>About Our Real-Time Communication Platform</h2>
+                <p>LiamGas is a modern, high-performance real-time messaging application designed to connect users across the globe. Built on a robust Python and Flask architecture, our platform provides instant, secure, and reliable communication channels for individuals, study groups, and developer communities.</p>
+                
+                <h3>Key Features & Capabilities</h3>
+                <ul>
+                    <li><strong>Instant Messaging Protocol:</strong> Utilizing advanced asynchronous requests to deliver messages with near-zero latency.</li>
+                    <li><strong>Secure Authentication:</strong> Industry-standard PBKDF2 SHA256 password hashing ensures user data remains strictly confidential and protected against unauthorized access.</li>
+                    <li><strong>Dynamic Room Creation:</strong> Users can provision dedicated chat environments tailored to specific topics, projects, or interests.</li>
+                    <li><strong>Persistent Storage:</strong> A highly available PostgreSQL database architecture guarantees message history is preserved and accessible.</li>
+                </ul>
+
+                <h3>Our Mission</h3>
+                <p>We aim to democratize online communication by providing a lightweight, ad-supported platform that prioritizes speed and user autonomy. Whether you are coordinating a school project, discussing programming paradigms, or just hanging out, LiamGas provides the digital infrastructure to make it happen.</p>
+            </div>
+
+            <div class="footer">
+                <a href="{{ url_for('about') }}">About Us</a>
+                <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                <a href="{{ url_for('terms') }}">Terms of Service</a>
+                <br><br>
+                &copy; 2026 LiamGas Technologies. All rights reserved.
+            </div>
         </div>
     </div>
     <script>

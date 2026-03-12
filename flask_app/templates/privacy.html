@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Privacy Policy - LiamGas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}" alt="Home"></a>
+        </div>
+        <div class="main-content">
+            <h1>Privacy Policy</h1>
+            <p>Last updated: March 2026</p>
+            <h2>1. Information We Collect</h2>
+            <p>We collect information you provide directly to us when you create an account, such as your username, password (hashed and salted), and profile picture URL. We also collect the messages you send within the chat rooms.</p>
+            <h2>2. How We Use Your Information</h2>
+            <p>We use the information we collect to operate, maintain, and provide the features of the LiamGas platform. We use it to authenticate you when you log in and to display your messages to other users in the chat rooms you join.</p>
+            <h2>3. Third-Party Services</h2>
+            <p>We use Google AdSense to display advertisements. Google uses cookies to serve ads based on your prior visits to our website or other websites. You can opt out of personalized advertising by visiting Google's Ads Settings.</p>
+            <h2>4. Data Security</h2>
+            <p>We take reasonable measures to help protect information about you from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. Your password is never stored in plain text.</p>
+            <h2>5. Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy, please contact us via our site administration tools.</p>
+            
+            <a href="{{ url_for('home') }}">Return Home</a>
+        </div>
+    </div>
+</body>
+</html>

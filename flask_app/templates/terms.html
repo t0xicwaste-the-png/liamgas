@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terms of Service - LiamGas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}" alt="Home"></a>
+        </div>
+        <div class="main-content">
+            <h1>Terms of Service</h1>
+            <p>Last updated: March 2026</p>
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing and using LiamGas ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, you may not use the Service.</p>
+            <h2>2. User Accounts</h2>
+            <p>You must provide accurate information when registering. You are responsible for safeguarding the password you use to access the Service and for any activities or actions under your password.</p>
+            <h2>3. Content Guidelines</h2>
+            <p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, or graphics ("Content"). You are responsible for the Content that you post. Do not post illegal, harassing, or malicious content. The administrators reserve the right to remove Content or ban accounts that violate community guidelines.</p>
+            <h2>4. Disclaimer</h2>
+            <p>Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis. The Service is provided without warranties of any kind, whether express or implied.</p>
+            <h2>5. Changes to Terms</h2>
+            <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. We will try to provide at least 30 days notice prior to any new terms taking effect.</p>
+            
+            <a href="{{ url_for('home') }}">Return Home</a>
+        </div>
+    </div>
+</body>
+</html>
