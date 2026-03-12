@@ -128,6 +128,11 @@ def profile():
     try:
         if request.method == 'POST':
             new_pic_url = request.form.get('profile_pic_url')
+            
+            if new_pic_url and len(new_pic_url) > 500:
+                flash('Error: The image link is too long! Please paste a direct URL (starting with http), not the raw image data.')
+                return redirect(url_for('profile'))
+
             if new_pic_url:
                 current_user.profile_pic_url = new_pic_url
                 db.session.commit()
