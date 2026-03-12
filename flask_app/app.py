@@ -8,6 +8,13 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-please-change-in-prod')
 
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 # Database Config (Supports Render Postgres or External Neon via MY_DB_URL)
 database_url = os.environ.get('MY_DB_URL') or os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
 if database_url and database_url.startswith("postgres://"):
@@ -24,6 +31,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
 
 # Models
 class User(UserMixin, db.Model):
