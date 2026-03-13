@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dev Blog - LiamGas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .blog-post {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #fff;
+        }
+        .blog-date {
+            color: #888;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.8em;
+        }
+        .footer a {
+            color: #888;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/home.png') }}" alt="Home"></a>
+        </div>
+        <div class="main-content">
+            <h1>Development Blog</h1>
+            <p>Welcome to the LiamGas engineering blog. Here we post updates about new features, architecture changes, and platform scaling.</p>
+            
+            <div class="blog-post">
+                <div class="blog-date">March 12, 2026</div>
+                <h2>Connection Pooling and Postgres Stability</h2>
+                <p>Today we rolled out a major infrastructure update to handle database connection scaling. Previously, when the platform experienced periods of low traffic, our Neon Serverless Postgres instance would aggressively sleep, causing "SSL connection unexpectedly closed" errors for the next incoming user.</p>
+                <p>We've implemented aggressive connection recycling (280 second TTL) within our SQLAlchemy engine options to ensure that stale connections are silently refreshed before they can trigger a 500 Server Error. This change drastically improves uptime without increasing our baseline compute footprint.</p>
+            </div>
+
+            <div class="blog-post">
+                <div class="blog-date">March 7, 2026</div>
+                <h2>v1.0 Platform Launch</h2>
+                <p>LiamGas v1.0 is officially live! We've successfully migrated from a local SQLite database to a fully managed PostgreSQL cluster hosted on Render. The new asynchronous chat fetching protocol handles concurrent users smoothly, providing a real-time experience without the overhead of WebSockets.</p>
+            </div>
+
+            <div class="footer">
+                <a href="{{ url_for('about') }}">About Us</a>
+                <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                <a href="{{ url_for('terms') }}">Terms of Service</a>
+                <a href="{{ url_for('home') }}">Return Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

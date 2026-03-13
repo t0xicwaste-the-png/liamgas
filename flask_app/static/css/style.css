@@ -2,7 +2,7 @@
 body {
     font-family: Arial, sans-serif; 
     background: #f6f3e7;
-    color: #333;
+    color: #353430;
     margin: 12px;
 }
 
@@ -36,7 +36,7 @@ body {
 /* Groups your main boxes together so they share the exact same borders and backgrounds */
 .messages, .room, .online-users {
     border: 2px solid #dcd6c3;
-    background: #faf7ee;
+    background: #fff9e8;
     border-radius: 12px;
     padding: 12px;
     margin-bottom: 12px;
