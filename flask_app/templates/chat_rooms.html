@@ -13,6 +13,9 @@
                 <a href="{{ url_for('create_room') }}" class="btn create">Create New Room</a>
                 {% endif %}
                 <a href="{{ url_for('profile') }}" class="btn" style="background: #17a2b8;">Profile</a>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn" style="background: #dc3545;">Admin</a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
             </div>
         </div>

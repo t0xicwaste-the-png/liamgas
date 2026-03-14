@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <title>Admin Dashboard</title>
+    </head>
+    <body>
+        <div class="header">Admin Dashboard</div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="{{ url_for('home') }}" style="color: white;">&larr; Back to Home</a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class="flashes" style="color: yellow;">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+
+            <table style="width: 100%; border-collapse: collapse; color: white;">
+                <tr style="border-bottom: 1px solid #00ff00;">
+                    <th style="padding: 10px; text-align: left;">ID</th>
+                    <th style="padding: 10px; text-align: left;">Username</th>
+                    <th style="padding: 10px; text-align: left;">Age (Days)</th>
+                    <th style="padding: 10px; text-align: left;">Role</th>
+                    <th style="padding: 10px; text-align: left;">Action</th>
+                </tr>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid #333;">
+                    <td style="padding: 10px;">{{ user.id }}</td>
+                    <td style="padding: 10px;">{{ user.username }}</td>
+                    <td style="padding: 10px;">
+                        {% if user.created_at %}
+                            {{ (now - user.created_at).days }} days
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px;">
+                        {% if user.is_admin %}
+                            <span style="color: #00ff00;">Admin</span>
+                        {% else %}
+                            User
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px;">
+                        {% if not user.is_admin %}
+                        <form action="{{ url_for('admin_delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Are you sure? Their messages will be transferred to you.');">
+                            <button type="submit" style="background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Ban & Delete</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
+</html>

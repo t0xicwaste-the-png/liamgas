@@ -8,9 +8,6 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-please-change-in-prod')
 
-if __name__ == "__main__":
-    app.run(debug=True)
-
 # Database Config (Supports Render Postgres or External Neon via MY_DB_URL)
 database_url = os.environ.get('MY_DB_URL') or os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
 if database_url and database_url.startswith("postgres://"):
@@ -34,6 +31,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # Profile picture URL (default is None/Null)
     profile_pic_url = db.Column(db.String(500))
     messages = db.relationship('Message', backref='author', lazy=True)
@@ -71,6 +69,15 @@ with app.app_context():
         # Ignore error if column already exists
         print(f"Migration skipped (likely already done): {e}")
 
+    # Migration: Add created_at if it doesn't exist
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(text('ALTER TABLE "user" ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))
+            conn.commit()
+            print("Added created_at column to User table.")
+    except Exception as e:
+        print(f"created_at Migration skipped (likely already done): {e}")
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -83,6 +90,10 @@ def home():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/gas')
+def gas():
+    return render_template('gas.html')
 
 @app.route('/privacy')
 def privacy():
@@ -146,6 +157,39 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Access denied.')
+        return redirect(url_for('home'))
+    users = User.query.all()
+    # Pass 'now' so template can calculate days ago
+    return render_template('admin.html', users=users, now=datetime.utcnow())
+
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def admin_delete_user(user_id):
+    if not current_user.is_admin:
+        flash('Access denied.')
+        return redirect(url_for('home'))
+        
+    target_user = User.query.get_or_404(user_id)
+    if target_user.is_admin:
+        flash('Cannot delete another admin account.')
+        return redirect(url_for('admin_dashboard'))
+        
+    # Handle constraints by reassigning to current user
+    # 1. Transfer messages
+    Message.query.filter_by(user_id=target_user.id).update({'user_id': current_user.id})
+    # 2. Transfer chat rooms created by them
+    ChatRoom.query.filter_by(created_by=target_user.id).update({'created_by': current_user.id})
+    
+    db.session.delete(target_user)
+    db.session.commit()
+    flash(f'User {target_user.username} deleted successfully. Their messages have been transferred to you.')
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -202,6 +246,12 @@ def chat_room(room_id):
 @app.route('/chat/<int:room_id>/send/', methods=['POST'])
 @login_required
 def send_message(room_id):
+    # Check if user is 20 seconds old
+    if current_user.created_at:
+        age_seconds = (datetime.utcnow() - current_user.created_at).total_seconds()
+        if age_seconds < 20:
+            return jsonify({'success': False, 'error': f'Your account must be 20 seconds old to talk. Wait {int(20 - age_seconds)} more seconds.'}), 403
+            
     content = request.form.get('content')
     if content:
         msg = Message(content=content, user_id=current_user.id, room_id=room_id)

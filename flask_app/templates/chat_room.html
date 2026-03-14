@@ -118,10 +118,13 @@
                     },
                     body: `content=${encodeURIComponent(message)}`
                 })
-                .then(response => {
-                    if (response.ok) {
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(res => {
+                    if (res.status === 200 && res.body.success) {
                         messageInput.value = '';
                         fetchNewMessages(); // Fetch immediately so user sees it faster
+                    } else if (res.body && res.body.error) {
+                        alert(res.body.error);
                     } else {
                         alert('Error sending message');
                     }

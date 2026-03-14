@@ -3,28 +3,41 @@
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
         <title>gas</title>
-
-        <!-- Google AdSense -->
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3967455593918125"
-        crossorigin="anonymous"></script>
-
+        <style>
+            /* Class for the fake ads so they float around randomly */
+            .fake-ad {
+                position: absolute;
+                z-index: 1000;
+                box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+                border: 2px solid #ccc;
+            }
+        </style>
     </head>
-    <body>
-        <h1>gas</h1>
+    <body style="position: relative; overflow-x: hidden; min-height: 100vh;">
+        <h1 style="text-align: center;">gas</h1>
+        
+        <div style="text-align: center;">
+            <button id="gas-btn" onclick="showAds()">get FREE gas</button>
+        </div>
 
-        <!-- Ad -->
-        <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-3967455593918125"
-            data-ad-slot="9120656862"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
+        <!-- The Real Ad -->
+        <div id="ad-container" style="display: none; margin-top: 20px; text-align: center;">
+            <h3>nothing in life is free</h3>
+            
+            <script>
+             atOptions = {
+             'key' : '41d662e7b9e834d5b39dc1695e3b7938',
+             'format' : 'iframe',
+             'height' : 250,
+             'width' : 300,
+             'params' : {}
+             };
+            </script>
+            <script src="https://www.highperformanceformat.com/41d662e7b9e834d5b39dc1695e3b7938/invoke.js"></script>
+            
+        </div>
 
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-
-        <button onclick="popup()">get FREE gas</button>
+        <script src="{{ url_for('static', filename='js/gas.js') }}"></script>
 
     </body>
 </html>
